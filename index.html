@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personalized data analysis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Data analysis</p>
+        <h1>Personalized data analysis</h1>
+        <p id="updated" class="updated">Loading the latest summary.</p>
+      </div>
+      <button id="recalculate" class="button button-secondary" type="button">Recalculate</button>
+    </header>
+
+    <p id="status" class="status" role="status" aria-live="polite" hidden></p>
+
+    <section class="card" aria-labelledby="import-heading">
+      <div class="card-header">
+        <h2 id="import-heading">Import data</h2>
+        <p class="card-subtitle">Upload an .xlsx or .csv file. The first row becomes the columns, and the rows below it replace the current data.</p>
+      </div>
+      <label class="file-drop" for="data-file">
+        <span class="file-drop-title">Choose a file</span>
+        <span id="file-name" class="file-drop-name">No file selected</span>
+        <input id="data-file" type="file" accept=".xlsx,.csv">
+      </label>
+      <div id="upload-preview" class="upload-preview" hidden>
+        <p id="preview-summary" class="preview-summary"></p>
+        <dl class="preview-list">
+          <dt>Columns</dt>
+          <dd id="preview-columns"></dd>
+        </dl>
+        <div class="form-actions">
+          <button id="preview-add" class="button" type="button">Replace data</button>
+          <button id="preview-cancel" class="button button-secondary" type="button">Cancel</button>
+        </div>
+      </div>
+      <div class="delete-bar">
+        <p id="delete-copy">Remove every row and column currently stored in the sheet.</p>
+        <div class="form-actions">
+          <button id="delete-data" class="button button-danger" type="button">Delete data</button>
+          <button id="delete-confirm" class="button button-danger" type="button" hidden>Delete all data</button>
+          <button id="delete-cancel" class="button button-secondary" type="button" hidden>Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="data-heading">
+      <div class="card-header">
+        <h2 id="data-heading">Data</h2>
+        <p id="data-count" class="card-subtitle">Import a spreadsheet to see the rows.</p>
+      </div>
+      <div id="data-table"></div>
+    </section>
+
+    <section class="card" aria-labelledby="descriptive-heading">
+      <div class="card-header">
+        <h2 id="descriptive-heading">Descriptive analysis</h2>
+      </div>
+      <div id="descriptive" class="table-wrap"></div>
+    </section>
+
+    <section class="card" aria-labelledby="bivariate-heading">
+      <div class="card-header">
+        <h2 id="bivariate-heading">Bivariate analysis</h2>
+      </div>
+      <div id="correlation" class="table-wrap"></div>
+    </section>
+
+    <section class="card" aria-labelledby="frequency-heading">
+      <div class="card-header">
+        <h2 id="frequency-heading">Frequencies</h2>
+      </div>
+      <div id="frequencies" class="table-wrap"></div>
+    </section>
+
+    <section class="card" aria-labelledby="figures-heading">
+      <div class="card-header">
+        <h2 id="figures-heading">Figures</h2>
+      </div>
+      <p id="figures-empty" class="message" hidden>Add a column with 12 or fewer different answers to see charts.</p>
+      <div id="figures" class="figures">
+        <figure class="figure">
+          <div class="figure-head">
+            <h3 id="bar-title" class="figure-title">Bar chart</h3>
+            <label class="select-label" for="bar-column">Column
+              <select id="bar-column"></select>
+            </label>
+          </div>
+          <div class="chart-box">
+            <canvas id="bar-chart" role="img" aria-labelledby="bar-title"></canvas>
+          </div>
+        </figure>
+        <figure class="figure">
+          <div class="figure-head">
+            <h3 id="pie-title" class="figure-title">Pie chart</h3>
+            <label class="select-label" for="pie-column">Column
+              <select id="pie-column"></select>
+            </label>
+          </div>
+          <div class="chart-box">
+            <canvas id="pie-chart" role="img" aria-labelledby="pie-title"></canvas>
+          </div>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
