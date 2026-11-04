@@ -27,20 +27,25 @@
         <h2 id="import-heading">Import data</h2>
         <p class="card-subtitle">Upload an .xlsx or .csv file. The first row becomes the columns, and the rows below it replace the current data.</p>
       </div>
-      <label class="file-drop" for="data-file">
-        <span class="file-drop-title">Choose a file</span>
+      <label id="file-drop" class="file-drop" for="data-file">
+        <span id="file-title" class="file-drop-title">Choose a file</span>
         <span id="file-name" class="file-drop-name">No file selected</span>
         <input id="data-file" type="file" accept=".xlsx,.csv">
       </label>
+      <p id="upload-result" class="upload-result" hidden></p>
       <div id="upload-preview" class="upload-preview" hidden>
         <p id="preview-summary" class="preview-summary"></p>
         <dl class="preview-list">
           <dt>Columns</dt>
           <dd id="preview-columns"></dd>
         </dl>
-        <div class="form-actions">
+        <div id="preview-actions" class="form-actions">
           <button id="preview-add" class="button" type="button">Replace data</button>
           <button id="preview-cancel" class="button button-secondary" type="button">Cancel</button>
+        </div>
+        <div id="upload-wait" class="upload-wait" hidden>
+          <p id="upload-wait-text" class="upload-wait-text">Uploading your file.</p>
+          <div class="upload-track" aria-hidden="true"><span class="upload-bar"></span></div>
         </div>
       </div>
       <div class="delete-bar">

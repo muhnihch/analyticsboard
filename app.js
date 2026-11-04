@@ -8,13 +8,19 @@ const elements = {
   updated: document.getElementById("updated"),
   status: document.getElementById("status"),
   recalculate: document.getElementById("recalculate"),
+  fileDrop: document.getElementById("file-drop"),
+  fileTitle: document.getElementById("file-title"),
   fileInput: document.getElementById("data-file"),
   fileName: document.getElementById("file-name"),
+  uploadResult: document.getElementById("upload-result"),
   preview: document.getElementById("upload-preview"),
   previewSummary: document.getElementById("preview-summary"),
   previewColumns: document.getElementById("preview-columns"),
+  previewActions: document.getElementById("preview-actions"),
   previewAdd: document.getElementById("preview-add"),
   previewCancel: document.getElementById("preview-cancel"),
+  uploadWait: document.getElementById("upload-wait"),
+  uploadWaitText: document.getElementById("upload-wait-text"),
   deleteData: document.getElementById("delete-data"),
   deleteConfirm: document.getElementById("delete-confirm"),
   deleteCancel: document.getElementById("delete-cancel"),
@@ -278,10 +284,12 @@ async function previewUpload() {
   const file = elements.fileInput.files[0];
   pendingUpload = null;
   elements.preview.hidden = true;
+  resetUploadSuccess();
   if (!file) {
     elements.fileName.textContent = "No file selected";
     return;
   }
+  elements.fileTitle.textContent = "File selected";
   elements.fileName.textContent = file.name;
 
   if (!/\.(xlsx|csv)$/i.test(file.name)) {
@@ -380,17 +388,23 @@ function showPreview(prepared) {
 async function sendUpload() {
   if (busy || !pendingUpload) return;
   const records = pendingUpload.records;
+  const fileName = elements.fileName.textContent;
   setBusy(true);
-  setStatus("Replacing the sheet with " + countFormat.format(records.length) + (records.length === 1 ? " row." : " rows."));
+  showUploadWait(fileName);
+  setStatus("Uploading " + fileName + ".");
   try {
     const result = await postRecords({ replace: true, records: records });
     const inserted = Number(result.inserted) || 0;
+    const message = uploadMessage(fileName, inserted);
+    await refreshAfterSave(message);
     clearUpload();
-    await refreshAfterSave("The sheet now has " + countFormat.format(inserted) + (inserted === 1 ? " row." : " rows."));
+    showUploadSuccess(fileName, message);
   } catch (error) {
     console.error(error);
+    hideUploadWait();
     setStatus("The sheet could not be replaced. Click Recalculate to see what is currently saved, then try again.", true);
   } finally {
+    hideUploadWait();
     setBusy(false);
   }
 }
@@ -405,9 +419,46 @@ async function refreshAfterSave(message) {
   }
 }
 
+function uploadMessage(fileName, inserted) {
+  const count = countFormat.format(inserted);
+  const stored = inserted === 1 ? "1 row is now stored." : count + " rows are now stored.";
+  return fileName + " was uploaded. " + stored;
+}
+
+function showUploadWait(fileName) {
+  elements.preview.hidden = false;
+  elements.preview.classList.add("is-waiting");
+  elements.previewActions.hidden = true;
+  elements.uploadWait.hidden = false;
+  elements.uploadWaitText.textContent = "Uploading " + fileName + ".";
+}
+
+function hideUploadWait() {
+  elements.preview.classList.remove("is-waiting");
+  elements.previewActions.hidden = false;
+  elements.uploadWait.hidden = true;
+}
+
+function showUploadSuccess(fileName, message) {
+  elements.fileDrop.classList.add("is-uploaded");
+  elements.fileTitle.textContent = "Uploaded";
+  elements.fileName.textContent = fileName;
+  elements.uploadResult.hidden = false;
+  elements.uploadResult.textContent = message;
+}
+
+function resetUploadSuccess() {
+  elements.fileDrop.classList.remove("is-uploaded");
+  elements.fileTitle.textContent = "Choose a file";
+  elements.uploadResult.hidden = true;
+  elements.uploadResult.textContent = "";
+}
+
 function clearUpload() {
   pendingUpload = null;
   elements.fileInput.value = "";
+  hideUploadWait();
+  resetUploadSuccess();
   elements.fileName.textContent = "No file selected";
   elements.preview.hidden = true;
   renderDataTable(columnNames(), summary && summary.rows ? summary.rows : []);
